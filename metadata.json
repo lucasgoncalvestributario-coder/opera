@@ -1,0 +1,8 @@
+{
+  "name": "SalesMaster PRO",
+  "description": "Sistema premium de gestão de vendas, metas e comissões com interface moderna em preto e amarelo e atualizações em tempo real.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": []
+}
