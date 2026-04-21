@@ -41,13 +41,13 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { collection, addDoc, deleteDoc, doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from './lib/firebase';
-import { SaleType, SaleStatus, Sale } from './types';
+import { SaleType, SaleStatus } from './types';
 import { cn } from './lib/utils';
 
 // --- Components ---
 
-const Card = ({ children, className, ...props }: { children: React.ReactNode; className?: string; [key: string]: any }) => (
-  <div className={cn("bg-[#111111] border border-[#222222] rounded-2xl p-5", className)} {...props}>
+const Card = ({ children, className }: { children: React.ReactNode; className?: string }) => (
+  <div className={cn("bg-[#111111] border border-[#222222] rounded-2xl p-5", className)}>
     {children}
   </div>
 );
@@ -450,8 +450,8 @@ const AlunosTab = () => {
     await deleteDoc(doc(db, 'users', user.uid, 'sales', id));
   };
 
-  const presencialEntries = Object.entries(groupedSales).filter(([city]) => city !== 'EAD') as [string, Sale[]][];
-  const eadEntries = (groupedSales['EAD'] || []) as Sale[];
+  const presencialEntries = Object.entries(groupedSales).filter(([city]) => city !== 'EAD');
+  const eadEntries = groupedSales['EAD'] || [];
 
   return (
     <div className="space-y-8 pb-24">
@@ -713,7 +713,7 @@ const SettingsTab = () => {
 // --- Main App Content ---
 
 const AppContent = () => {
-  const { user, loading, signIn, hasConfig } = useAuth();
+  const { user, loading, signIn } = useAuth();
   const [activeTab, setActiveTab] = useState('home');
 
   if (loading) {
@@ -750,26 +750,14 @@ const AppContent = () => {
             <p className="text-gray-500 font-medium">Controle suas vendas, metas e comissões com design premium e automação total.</p>
           </div>
 
-          {!hasConfig ? (
-            <div className="bg-red-500/10 border border-red-500/20 p-6 rounded-2xl space-y-4">
-              <p className="text-red-500 text-sm font-bold">Configuração Pendente</p>
-              <p className="text-gray-400 text-xs leading-relaxed">
-                As chaves do Supabase não foram configuradas. <br/><br/>
-                Por favor, adicione <b>VITE_SUPABASE_URL</b> e <b>VITE_SUPABASE_ANON_KEY</b> no menu de <b>Secrets</b> para que o aplicativo possa funcionar.
-              </p>
-            </div>
-          ) : (
-            <>
-              <button 
-                onClick={signIn}
-                className="w-full bg-[#FFD700] text-black font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-[#FFC400] transition-all hover:scale-[1.02] shadow-xl"
-              >
-                <LogInIcon size={20} /> Entrar com Google
-              </button>
-              
-              <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Inicie sua jornada agora</p>
-            </>
-          )}
+          <button 
+            onClick={signIn}
+            className="w-full bg-[#FFD700] text-black font-black py-4 rounded-2xl flex items-center justify-center gap-3 hover:bg-[#FFC400] transition-all hover:scale-[1.02] shadow-xl"
+          >
+            <LogInIcon size={20} /> Entrar com Google
+          </button>
+          
+          <p className="text-[10px] text-gray-600 font-bold uppercase tracking-widest">Inicie sua jornada agora</p>
         </div>
       </div>
     );

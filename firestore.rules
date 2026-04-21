@@ -1,59 +1,31 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Helper functions
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
     function isSignedIn() {
       return request.auth != null;
     }
-    
+
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
-    }
-
-    function isValidString(val, maxLen) {
-      return val is string && val.size() <= maxLen;
     }
 
     function isValidId(id) {
        return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
-    // Default deny
-    match /{document=**} {
-      allow read, write: if false;
-    }
-
-    // User profiles and sales
     match /users/{userId} {
-      allow get: if isOwner(userId);
-      allow create, update: if isOwner(userId) && isValidSettings(request.resource.data);
-      
-      function isValidSettings(data) {
-        return data.userId == request.auth.uid &&
-               (data.name == null || isValidString(data.name, 100)) &&
-               (data.photoURL == null || isValidString(data.photoURL, 500));
-      }
+      allow read: if isOwner(userId);
+      allow write: if isOwner(userId);
 
       match /sales/{saleId} {
-        allow list: if isOwner(userId);
-        allow get: if isOwner(userId);
-        allow create: if isOwner(userId) && isValidSale(request.resource.data);
-        allow update: if isOwner(userId) && isValidSale(request.resource.data);
-        allow delete: if isOwner(userId);
-
-        function isValidSale(data) {
-          return data.userId == request.auth.uid &&
-                 isValidString(data.clientName, 200) &&
-                 isValidString(data.city, 100) &&
-                 data.type in ['Presencial', 'EAD'] &&
-                 data.status in ['Pendente', 'Pago'];
-        }
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId) && isValidId(saleId);
+        allow update, delete: if isOwner(userId);
       }
-    }
-    
-    // Explicit deny for any other top level
-    match /test/{docId} {
-      allow read: if true; // Allowed for connection testing
     }
   }
 }

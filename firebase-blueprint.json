@@ -1,10 +1,13 @@
 {
   "entities": {
-    "UserSettings": {
-      "title": "User Settings",
-      "description": "User specific settings and profile info",
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "User shared data and settings",
       "type": "object",
       "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "photoURL": { "type": "string" },
         "baseSalary": { "type": "number" },
         "salesTarget": { "type": "number" },
         "cityTravelBonus": { "type": "number" },
@@ -12,39 +15,49 @@
         "bonusEAD15": { "type": "number" },
         "bonusTotal25": { "type": "number" },
         "bonusTotal35": { "type": "number" },
-        "cities": { "type": "object" },
-        "enableBonusEAD15": { "type": "boolean" },
-        "enableBonusTotal25": { "type": "boolean" },
-        "enableBonusTotal35": { "type": "boolean" },
-        "name": { "type": "string" },
-        "photoURL": { "type": "string" },
-        "userId": { "type": "string" }
+        "rules": {
+          "type": "object",
+          "properties": {
+            "cities": {
+              "type": "object",
+              "properties": {
+                "Londrina": { "type": "boolean" },
+                "Curitiba": { "type": "boolean" },
+                "Maringá": { "type": "boolean" },
+                "Toledo": { "type": "boolean" }
+              }
+            },
+            "enableBonusEAD15": { "type": "boolean" },
+            "enableBonusTotal25": { "type": "boolean" },
+            "enableBonusTotal35": { "type": "boolean" }
+          }
+        }
       },
-      "required": ["userId"]
+      "required": ["userId", "name"]
     },
     "Sale": {
-      "title": "Sale",
-      "description": "Individual sales record",
+      "title": "Sale Record",
+      "description": "Individual sale record",
       "type": "object",
       "properties": {
+        "userId": { "type": "string" },
         "clientName": { "type": "string" },
         "city": { "type": "string" },
         "type": { "type": "string", "enum": ["Presencial", "EAD"] },
         "status": { "type": "string", "enum": ["Pendente", "Pago"] },
-        "createdAt": { "type": "string", "format": "date-time" },
-        "userId": { "type": "string" }
+        "createdAt": { "type": "string", "format": "date-time" }
       },
-      "required": ["clientName", "city", "type", "status", "userId"]
+      "required": ["userId", "clientName", "city", "type", "status"]
     }
   },
   "firestore": {
-    "users/{userId}": {
-      "schema": "UserSettings",
+    "/users/{userId}": {
+      "schema": "UserProfile",
       "description": "User profile and settings"
     },
-    "users/{userId}/sales/{saleId}": {
+    "/users/{userId}/sales/{saleId}": {
       "schema": "Sale",
-      "description": "Sales records for a specific user"
+      "description": "User sales records"
     }
   }
 }

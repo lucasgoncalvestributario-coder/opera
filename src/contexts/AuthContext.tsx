@@ -9,7 +9,6 @@ interface AuthContextType {
   loading: boolean;
   settings: UserSettings;
   sales: Sale[];
-  hasConfig: boolean;
   signIn: () => Promise<void>;
   logout: () => Promise<void>;
   updateSettings: (newSettings: Partial<UserSettings>) => Promise<void>;
@@ -22,7 +21,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
   const [sales, setSales] = useState<Sale[]>([]);
-  const [hasConfig] = useState(true);
 
   useEffect(() => {
     // Fallback security: ensure loading doesn't hang forever
@@ -65,10 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             console.error("Sales error:", err);
           });
 
-          return () => {
-             unsubSettings();
-             unsubSales();
-          };
+          // Store unsubscribers for cleanup if needed, but useEffect handles it via auth state
         } else {
           setSettings(DEFAULT_SETTINGS);
           setSales([]);
@@ -102,7 +97,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, settings, sales, hasConfig, signIn, logout, updateSettings }}>
+    <AuthContext.Provider value={{ user, loading, settings, sales, signIn, logout, updateSettings }}>
       {children}
     </AuthContext.Provider>
   );
